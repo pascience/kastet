@@ -1,4 +1,7 @@
 function createCubeData() {
+  let r = 1.0
+  let g = 0.3
+  let b = 0.3
   var positions = [
     // Front face
     -1.0, -1.0,  1.0,
@@ -35,15 +38,15 @@ function createCubeData() {
     -1.0, -1.0,  1.0,
     -1.0,  1.0,  1.0,
     -1.0,  1.0, -1.0
-  ];
+  ];   
 
   var colorsOfFaces = [
-    [0.3,  1.0,  1.0,  1.0],    // Front face: cyan
-    [1.0,  0.3,  0.3,  1.0],    // Back face: red
-    [0.3,  1.0,  0.3,  1.0],    // Top face: green
-    [0.3,  0.3,  1.0,  1.0],    // Bottom face: blue
-    [1.0,  1.0,  0.3,  1.0],    // Right face: yellow
-    [1.0,  0.3,  1.0,  1.0]     // Left face: purple
+    [r, g, b,  1.0], // Front
+    [r, g, b,  1.0], // Back
+    [r, g, b,  1.0], // Top
+    [r, g, b,  1.0], // Bottom
+    [r, g, b,  1.0], // Right
+    [r, g, b,  1.0], // Left
   ];
 
   var colors = [];
@@ -93,10 +96,6 @@ function createBuffersForCube( gl, cube ) {
     colors: colors,
     elements: elements
   }
-}
-
-function matrixArrayToCssMatrix(array) {
-  return "matrix3d(" + array.join(',') + ")";
 }
 
 function multiplyPoint(matrix, point) {
