@@ -10,13 +10,18 @@ let ngl = {
     projection: null,
     view: null,
   },
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: document.body.offsetWidth,
+  height: document.body.offsetHeight,
   pressed_keys: {}
 }
+let canvas = document.getElementById("sketch")
+canvas.width = document.body.offsetWidth
+canvas.height = document.body.offsetHeight
 window.addEventListener("resize", () => {
-  ngl.width = window.innerWidth
-  ngl.height = window.innerHeight
+  ngl.width = document.body.offsetWidth
+  ngl.height = document.body.offsetHeight
+  canvas.width = document.body.offsetWidth
+  canvas.height = document.body.offsetHeight
 })
 window.addEventListener("keydown", function(event) {
   if(! event.repeat) {
@@ -27,7 +32,9 @@ window.addEventListener("keyup", function(event) {
   delete ngl.pressed_keys[event.key]
 }, true)
 
-let gl = document.getElementById("sketch").getContext("webgl")
+
+
+let gl = canvas.getContext("webgl")
 { // WebGL setup
   gl.enable(gl.DEPTH_TEST)
 
