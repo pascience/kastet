@@ -2,6 +2,7 @@ let ngl = {
   buffers: {},
   locations: {
     position: null,
+    normalAtVertex: null,
     colorAttribute: null,
     colorUniform: null,
     resolution: null,
@@ -65,13 +66,17 @@ let gl = canvas.getContext("webgl")
   gl.useProgram(pgm)
 
   ngl.locations.position = gl.getAttribLocation(pgm, "position")
-  // ngl.locations.colorAttribute = gl.getAttribLocation(pgm, "color")
+  ngl.locations.normalAtVertex = gl.getAttribLocation(pgm, "normalAtVertex")
+  // ngl.locations.colorAttribute = gl.getAttribLocation(pgm, "colorAttribute")
   ngl.locations.colorUniform = gl.getUniformLocation(pgm, "color")
   // ngl.locations.resolution = gl.getUniformLocation(pgm, "resolution")
   // ngl.locations.texture = gl.getUniformLocation(pgm, "texture")
+  ngl.locations.normalMatrix = gl.getUniformLocation(pgm, "uNormalMatrix")
   ngl.locations.model = gl.getUniformLocation(pgm, "model")
   ngl.locations.projection = gl.getUniformLocation(pgm, "projection")
   ngl.locations.view = gl.getUniformLocation(pgm, "view")  
+  gl.enableVertexAttribArray(ngl.locations.position)
+  gl.enableVertexAttribArray(ngl.locations.normalAtVertex)
 }
 
 draw_setup({ ngl, gl })

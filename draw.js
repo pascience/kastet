@@ -1,12 +1,14 @@
 window.vertexShader = `
   attribute vec3 position;
+  attribute vec3 normalAtVertex;
+  attribute vec3 colorAttribute;
   uniform vec3 color;
 
   uniform mat4 model;
   uniform mat4 projection;
   uniform mat4 view;
 
-  varying vec4 vColor;
+  varying vec3 vLighting;
 
   mat4 inverse(mat4 m) {
     float
@@ -48,25 +50,48 @@ window.vertexShader = `
         a31 * b01 - a30 * b03 - a32 * b00,
         a20 * b03 - a21 * b01 + a22 * b00) / det;
   }
+  mat4 transpose(mat4 m) {
+  return mat4(m[0][0], m[1][0], m[2][0], m[3][0],
+              m[0][1], m[1][1], m[2][1], m[3][1],
+              m[0][2], m[1][2], m[2][2], m[3][2],
+              m[0][3], m[1][3], m[2][3], m[3][3]);
+}
 
   void main() {
-    vColor = vec4(color, 1.0);
     gl_Position = projection * inverse(view) * model * vec4(position, 1.0);
+
+    mat4 uNormalMatrix = transpose(inverse(inverse(view) * model));
+    
+    highp vec3 ambientLight = vec3(0.6, 0.6, 0.6);
+    highp vec3 directionalLightColor = vec3(0.5, 0.5, 0.75);
+    highp vec3 directionalVector = vec3(0.85, 0.8, 0.75);
+    
+    highp vec4 transformedNormal = uNormalMatrix * vec4(normalAtVertex, 1.0);
+    
+    highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+    vLighting = color * (ambientLight + (directionalLightColor * directional));
   }
 `
 window.fragmentShader = `
   precision mediump float;
 
-  varying vec4 vColor;
+  varying vec3 vLighting;
 
   void main(void) {      
-    gl_FragColor = vColor; 
+    gl_FragColor = vec4(vLighting, 1.0); 
   }
 `
 
 function draw_setup({ ngl, gl }) {
-  let cube_data = positions_for_solid_colored_cube({ r: 1.0, g: 0.3, b: 0.3 })
-  ngl.buffers.cube = createBuffersForCube(gl, cube_data)
+  ngl.buffers.cube = createBuffersForCube(gl, buffer_data_for_cube())
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.positions)
+  gl.vertexAttribPointer(ngl.locations.position, 3, gl.FLOAT, false, 0, 0)
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.normals)
+  gl.vertexAttribPointer(ngl.locations.normalAtVertex, 3, gl.FLOAT, false, 0, 0)
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ngl.buffers.cube.elements)
 }
 
 let rgb_for_color = {
@@ -89,13 +114,6 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
     gl.uniformMatrix4fv(ngl.locations.view, false, new Float32Array(view))
   }
 
-  { // from here on we're drawing cubes
-    gl.enableVertexAttribArray(ngl.locations.position)
-    gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.positions)
-    gl.vertexAttribPointer(ngl.locations.position, 3, gl.FLOAT, false, 0, 0)
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ngl.buffers.cube.elements)
-  }
   let drawCubeElements = () => { gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0) }
   let useColor = (rgb) => {
     gl.uniform3fv(ngl.locations.colorUniform, rgb)
@@ -109,7 +127,7 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
     drawCubeElements()
   }
 
-  let drawPiece = ({ piece_id, rgb, offset }) => {
+  let drawPiece = ({ piece_id, offset }) => {
     let piece_model = puzzle_models[piece_id]
     for(let cell = 0; cell < piece_model.length; cell += 1) {
       let height = piece_model[cell]
@@ -117,7 +135,6 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
         continue
       }
       for(let cur_height = 0; cur_height < height; cur_height += 1) {
-        useColor(lighten(rgb, cur_height == 1 ? 0.5 : 0))
         drawCube({
           x: offset[0] + cell % 2,
           z: offset[1] + Math.floor(cell / 2),
@@ -128,10 +145,10 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
   }
 
   ["red" , "green", "blue", "yellow"].forEach((color_name, color_number) => {
+    useColor(rgb_for_color[color_name])
     pieces_for_color[color_name].forEach((piece_id, piece_number_for_this_color) => {
       drawPiece({
         piece_id,
-        rgb: rgb_for_color[color_name],
         offset: [piece_number_for_this_color*3, color_number*10, 0]
       })
     })

@@ -1,44 +1,93 @@
-function positions_for_solid_colored_cube({ r, g, b }) {
-  let vertices = [
-    -1.0, -1.0,  1.0, // A
-     1.0, -1.0,  1.0, // B
-     1.0,  1.0,  1.0, // C
-    -1.0,  1.0,  1.0, // D
-    -1.0, -1.0, -1.0, // E
-    -1.0,  1.0, -1.0, // F
-     1.0,  1.0, -1.0, // G
-     1.0, -1.0, -1.0, // H
+function buffer_data_for_cube() {
+  let positions = [
+    // Front face
+    -1.0, -1.0,  1.0,
+     1.0, -1.0,  1.0,
+     1.0,  1.0,  1.0,
+    -1.0,  1.0,  1.0,
+    // Back face
+    -1.0, -1.0, -1.0,
+    -1.0,  1.0, -1.0,
+     1.0,  1.0, -1.0,
+     1.0, -1.0, -1.0,
+    // Top face
+    -1.0,  1.0, -1.0,
+    -1.0,  1.0,  1.0,
+     1.0,  1.0,  1.0,
+     1.0,  1.0, -1.0,
+    // Bottom face
+    -1.0, -1.0, -1.0,
+     1.0, -1.0, -1.0,
+     1.0, -1.0,  1.0,
+    -1.0, -1.0,  1.0,
+    // Right face
+     1.0, -1.0, -1.0,
+     1.0,  1.0, -1.0,
+     1.0,  1.0,  1.0,
+     1.0, -1.0,  1.0,
+    // Left face
+    -1.0, -1.0, -1.0,
+    -1.0, -1.0,  1.0,
+    -1.0,  1.0,  1.0,
+    -1.0,  1.0, -1.0
+  ]
+  let normals = [
+    // Front
+     0.0,  0.0,  1.0,
+     0.0,  0.0,  1.0,
+     0.0,  0.0,  1.0,
+     0.0,  0.0,  1.0,
+    // Back
+     0.0,  0.0, -1.0,
+     0.0,  0.0, -1.0,
+     0.0,  0.0, -1.0,
+     0.0,  0.0, -1.0,
+    // Top
+     0.0,  1.0,  0.0,
+     0.0,  1.0,  0.0,
+     0.0,  1.0,  0.0,
+     0.0,  1.0,  0.0,
+    // Bottom
+     0.0, -1.0,  0.0,
+     0.0, -1.0,  0.0,
+     0.0, -1.0,  0.0,
+     0.0, -1.0,  0.0,
+    // Right
+     1.0,  0.0,  0.0,
+     1.0,  0.0,  0.0,
+     1.0,  0.0,  0.0,
+     1.0,  0.0,  0.0,
+    // Left
+    -1.0,  0.0,  0.0,
+    -1.0,  0.0,  0.0,
+    -1.0,  0.0,  0.0,
+    -1.0,  0.0,  0.0
   ]
   let elements = [
-    0,1,2, 0,2,3, // front
-    4,5,6, 4,6,7, // back
-    5,3,2, 5,2,6, // top
-    4,7,1, 4,1,0, // bottom
-    7,6,2, 7,2,1, // right
-    4,0,3, 4,3,5, // left
+    0,  1,  2,      0,  2,  3,    // front
+    4,  5,  6,      4,  6,  7,    // back
+    8,  9,  10,     8,  10, 11,   // top
+    12, 13, 14,     12, 14, 15,   // bottom
+    16, 17, 18,     16, 18, 19,   // right
+    20, 21, 22,     20, 22, 23    // left
   ]
-
-  return {
-    positions: vertices,
-    elements: elements,
-  }
+  return { positions, normals, elements }
 }
 
-// Take the data for a cube and bind the buffers for it.
-// Return an object collection of the buffers
-function createBuffersForCube( gl, cube ) {
-  var positions = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positions);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube.positions), gl.STATIC_DRAW);
+function createBuffersForCube(gl, buffer_data) {
+  let positions = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, positions)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buffer_data.positions), gl.STATIC_DRAW)
 
-  var elements = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elements);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cube.elements), gl.STATIC_DRAW);
+  let normals = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, normals)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buffer_data.normals), gl.STATIC_DRAW)
 
-  return {
-    positions: positions,
-    elements: elements
-  }
+  let elements = gl.createBuffer()
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elements)
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(buffer_data.elements), gl.STATIC_DRAW)
+
+  return { positions, elements, normals }
 }
 
 function multiplyPoint(matrix, point) {
