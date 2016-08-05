@@ -69,7 +69,7 @@ function draw_setup({ ngl, gl }) {
   ngl.buffers.cube = createBuffersForCube(gl, cube_data)
 }
 
-let colors = {
+let rgb_for_color = {
   red: [1.0, 0.2, 0.2],
   green: [0.2, 1.0, 0.2],
   blue: [0.2, 0.2, 1.0],
@@ -84,8 +84,6 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
     let view = multiplyArrayOfMatrices([
       translateMatrix(camera.position[0], camera.position[1], camera.position[2]),
       rotateXMatrix(Math.PI/2),
-      // scaleMatrix(1, 1, 0.5),
-      // scaleMatrix(1, 1, 1), // last arg = zoom, if the looked-at point is the origin
     ])
     gl.uniformMatrix4fv(ngl.locations.projection, false, new Float32Array(projection))
     gl.uniformMatrix4fv(ngl.locations.view, false, new Float32Array(view))
@@ -111,27 +109,35 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
     drawCubeElements()
   }
 
-  ["red" , "green", "blue", "yellow"].forEach((color, color_number) => {
-    pieces_for_color[color].forEach((piece_id, piece_number_for_this_color) => {
-      let piece_model = puzzle_models[piece_id]
-      
-      for(let cell = 0; cell < piece_model.length; cell += 1) {
-        let height = piece_model[cell]
-        if(height < 1) {
-          continue
-        }
-
-        let cur_height = 0
-        while(cur_height < height) {
-          useColor(lighten(colors[color], cur_height == 1 ? 0.5 : 0))
-          drawCube({
-            x: piece_number_for_this_color*3 + cell % 2,
-            z: color_number*10 + Math.floor(cell / 2),
-            y: cur_height
-          })
-          cur_height += 1
-        }
+  let drawPiece = ({ piece_id, rgb, offset }) => {
+    let piece_model = puzzle_models[piece_id]
+    for(let cell = 0; cell < piece_model.length; cell += 1) {
+      let height = piece_model[cell]
+      if(height < 1) {
+        continue
       }
+
+      let cur_height = 0
+      while(cur_height < height) {
+        useColor(lighten(rgb, cur_height == 1 ? 0.5 : 0))
+        
+        drawCube({
+          x: offset[0] + cell % 2,
+          z: offset[1] + Math.floor(cell / 2),
+          y: offset[2] + cur_height
+        })
+        cur_height += 1
+      }
+    }
+  }
+
+  ["red" , "green", "blue", "yellow"].forEach((color_name, color_number) => {
+    pieces_for_color[color_name].forEach((piece_id, piece_number_for_this_color) => {
+      drawPiece({
+        piece_id,
+        rgb: rgb_for_color[color_name],
+        offset: [piece_number_for_this_color*3, color_number*10, 0]
+      })
     })
   })
 }
