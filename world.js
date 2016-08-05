@@ -86,6 +86,12 @@ function world_step({ dt, state: { t, frame, camera }, keys }) {
 	if(keys["ArrowUp"]) {
 		camera_position[2] -= 0.1
 	}
+	if(keys["z"] || keys["Z"]) {
+		camera_position[1] -= 0.1
+	}
+	if(keys["s"] || keys["S"]) {
+		camera_position[1] += 0.1
+	}
   return {
     t: t+dt,
     frame: frame+1,
