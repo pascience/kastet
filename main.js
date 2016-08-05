@@ -1,15 +1,12 @@
 let ngl = {
   buffers: {},
   locations: {
-    position: null,
-    normalAtVertex: null,
-    colorAttribute: null,
-    colorUniform: null,
-    resolution: null,
-    texture: null,
-    model: null,
-    projection: null,
-    view: null,
+    aVertexPosition: null,
+    aVertexNormal: null,
+    uVertexColor: null,
+    uModelMatrix: null,
+    uProjectionMatrix: null,
+    uViewMatrix: null,
   },
   width: document.body.offsetWidth,
   height: document.body.offsetHeight,
@@ -65,18 +62,15 @@ let gl = canvas.getContext("webgl")
   let pgm = createWebGLProgram(window.vertexShader, window.fragmentShader)
   gl.useProgram(pgm)
 
-  ngl.locations.position = gl.getAttribLocation(pgm, "position")
-  ngl.locations.normalAtVertex = gl.getAttribLocation(pgm, "normalAtVertex")
-  // ngl.locations.colorAttribute = gl.getAttribLocation(pgm, "colorAttribute")
-  ngl.locations.colorUniform = gl.getUniformLocation(pgm, "color")
-  // ngl.locations.resolution = gl.getUniformLocation(pgm, "resolution")
-  // ngl.locations.texture = gl.getUniformLocation(pgm, "texture")
-  ngl.locations.normalMatrix = gl.getUniformLocation(pgm, "uNormalMatrix")
-  ngl.locations.model = gl.getUniformLocation(pgm, "model")
-  ngl.locations.projection = gl.getUniformLocation(pgm, "projection")
-  ngl.locations.view = gl.getUniformLocation(pgm, "view")  
-  gl.enableVertexAttribArray(ngl.locations.position)
-  gl.enableVertexAttribArray(ngl.locations.normalAtVertex)
+  ngl.locations.aVertexPosition = gl.getAttribLocation(pgm, "aVertexPosition")
+  gl.enableVertexAttribArray(ngl.locations.aVertexPosition)
+  ngl.locations.aVertexNormal = gl.getAttribLocation(pgm, "aVertexNormal")
+  gl.enableVertexAttribArray(ngl.locations.aVertexNormal)
+
+  ngl.locations.uVertexColor = gl.getUniformLocation(pgm, "uVertexColor")
+  ngl.locations.uModelMatrix = gl.getUniformLocation(pgm, "uModelMatrix")
+  ngl.locations.uProjectionMatrix = gl.getUniformLocation(pgm, "uProjectionMatrix")
+  ngl.locations.uViewMatrix = gl.getUniformLocation(pgm, "uViewMatrix")  
 }
 
 draw_setup({ ngl, gl })

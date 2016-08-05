@@ -1,12 +1,11 @@
 window.vertexShader = `
-  attribute vec3 position;
-  attribute vec3 normalAtVertex;
-  attribute vec3 colorAttribute;
-  uniform vec3 color;
+  attribute vec3 aVertexPosition;
+  attribute vec3 aVertexNormal;
+  uniform vec3 uVertexColor;
 
-  uniform mat4 model;
-  uniform mat4 projection;
-  uniform mat4 view;
+  uniform mat4 uModelMatrix;
+  uniform mat4 uViewMatrix;
+  uniform mat4 uProjectionMatrix;
 
   varying vec3 vLighting;
 
@@ -58,18 +57,19 @@ window.vertexShader = `
 }
 
   void main() {
-    gl_Position = projection * inverse(view) * model * vec4(position, 1.0);
+    mat4 mvMatrix = inverse(uViewMatrix) * uModelMatrix;
+    gl_Position = uProjectionMatrix * mvMatrix * vec4(aVertexPosition, 1.0);
 
-    mat4 uNormalMatrix = transpose(inverse(inverse(view) * model));
+    mat4 normalMatrix = transpose(inverse(mvMatrix));
     
     highp vec3 ambientLight = vec3(0.6, 0.6, 0.6);
     highp vec3 directionalLightColor = vec3(0.5, 0.5, 0.75);
     highp vec3 directionalVector = vec3(0.85, 0.8, 0.75);
     
-    highp vec4 transformedNormal = uNormalMatrix * vec4(normalAtVertex, 1.0);
+    highp vec4 transformedNormal = normalMatrix * vec4(aVertexNormal, 1.0);
     
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
-    vLighting = color * (ambientLight + (directionalLightColor * directional));
+    vLighting = uVertexColor * (ambientLight + (directionalLightColor * directional));
   }
 `
 window.fragmentShader = `
@@ -86,10 +86,10 @@ function draw_setup({ ngl, gl }) {
   ngl.buffers.cube = createBuffersForCube(gl, buffer_data_for_cube())
 
   gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.positions)
-  gl.vertexAttribPointer(ngl.locations.position, 3, gl.FLOAT, false, 0, 0)
+  gl.vertexAttribPointer(ngl.locations.aVertexPosition, 3, gl.FLOAT, false, 0, 0)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.normals)
-  gl.vertexAttribPointer(ngl.locations.normalAtVertex, 3, gl.FLOAT, false, 0, 0)
+  gl.vertexAttribPointer(ngl.locations.aVertexNormal, 3, gl.FLOAT, false, 0, 0)
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ngl.buffers.cube.elements)
 }
@@ -110,17 +110,17 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
       translateMatrix(camera.position[0], camera.position[1], camera.position[2]),
       rotateXMatrix(Math.PI/2),
     ])
-    gl.uniformMatrix4fv(ngl.locations.projection, false, new Float32Array(projection))
-    gl.uniformMatrix4fv(ngl.locations.view, false, new Float32Array(view))
+    gl.uniformMatrix4fv(ngl.locations.uProjectionMatrix, false, new Float32Array(projection))
+    gl.uniformMatrix4fv(ngl.locations.uViewMatrix, false, new Float32Array(view))
   }
 
   let drawCubeElements = () => { gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0) }
   let useColor = (rgb) => {
-    gl.uniform3fv(ngl.locations.colorUniform, rgb)
+    gl.uniform3fv(ngl.locations.uVertexColor, rgb)
   }
 
   let drawCube = ({ x, y, z }) => {
-    gl.uniformMatrix4fv(ngl.locations.model, false, new Float32Array(multiplyArrayOfMatrices([
+    gl.uniformMatrix4fv(ngl.locations.uModelMatrix, false, new Float32Array(multiplyArrayOfMatrices([
       translateMatrix(x, y, z),
       scaleMatrix(0.5, 0.5, 0.5)
     ])))
