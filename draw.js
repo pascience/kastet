@@ -63,7 +63,13 @@ window.fragmentShader = `
     gl_FragColor = vColor; 
   }
 `
-function draw({ dt, state: { frame }, ngl, gl }) {
+
+function draw_setup({ ngl, gl }) {
+  let cube_data = positions_for_solid_colored_cube({ r: 1.0, g: 0.3, b: 0.3 })
+  ngl.buffers.cube = createBuffersForCube(gl, cube_data)
+}
+
+function draw_frame({ dt, state: { frame }, ngl, gl }) {
   {
     let model = multiplyArrayOfMatrices([
       translateMatrix(0, 0, -2),

@@ -55,13 +55,14 @@ let gl = document.getElementById("sketch").getContext("webgl")
   ngl.locations.projection = gl.getUniformLocation(pgm, "projection")
   ngl.locations.view = gl.getUniformLocation(pgm, "view")
 
-  ngl.buffers.cube = createBuffersForCube(gl, positions_for_solid_colored_cube({ r: 1.0, g: 0.3, b: 0.3 }))
+  
 }
 
-let state = setup()
+draw_setup({ ngl, gl })
+let state = world_setup()
 let each_frame = (dt) => {
-  state = step({ dt, state })
-  draw({ dt, state, ngl, gl })
+  state = world_step({ dt, state })
+  draw_frame({ dt, state, ngl, gl })
   requestAnimationFrame(each_frame)
 }
 requestAnimationFrame(each_frame)
