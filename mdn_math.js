@@ -1,75 +1,30 @@
-function createCubeData() {
-  let r = 1.0
-  let g = 0.3
-  let b = 0.3
-  var positions = [
-    // Front face
-    -1.0, -1.0,  1.0,
-     1.0, -1.0,  1.0,
-     1.0,  1.0,  1.0,
-    -1.0,  1.0,  1.0,
-
-    // Back face
-    -1.0, -1.0, -1.0,
-    -1.0,  1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0, -1.0, -1.0,
-
-    // Top face
-    -1.0,  1.0, -1.0,
-    -1.0,  1.0,  1.0,
-     1.0,  1.0,  1.0,
-     1.0,  1.0, -1.0,
-
-    // Bottom face
-    -1.0, -1.0, -1.0,
-     1.0, -1.0, -1.0,
-     1.0, -1.0,  1.0,
-    -1.0, -1.0,  1.0,
-
-    // Right face
-     1.0, -1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0,  1.0,  1.0,
-     1.0, -1.0,  1.0,
-
-    // Left face
-    -1.0, -1.0, -1.0,
-    -1.0, -1.0,  1.0,
-    -1.0,  1.0,  1.0,
-    -1.0,  1.0, -1.0
-  ];   
-
-  var colorsOfFaces = [
-    [r, g, b,  1.0], // Front
-    [r, g, b,  1.0], // Back
-    [r, g, b,  1.0], // Top
-    [r, g, b,  1.0], // Bottom
-    [r, g, b,  1.0], // Right
-    [r, g, b,  1.0], // Left
-  ];
-
-  var colors = [];
-
-  for (var j=0; j<6; j++) {
-    var polygonColor = colorsOfFaces[j];
-  
-    for (var i=0; i<4; i++) {
-      colors = colors.concat( polygonColor );
-    }
-  }
-
-  var elements = [
-    0,  1,  2,      0,  2,  3,    // front
-    4,  5,  6,      4,  6,  7,    // back
-    8,  9,  10,     8,  10, 11,   // top
-    12, 13, 14,     12, 14, 15,   // bottom
-    16, 17, 18,     16, 18, 19,   // right
-    20, 21, 22,     20, 22, 23    // left
+function positions_for_solid_colored_cube({ r, g, b }) {
+  let vertices = [
+    -1.0, -1.0,  1.0, // A
+     1.0, -1.0,  1.0, // B
+     1.0,  1.0,  1.0, // C
+    -1.0,  1.0,  1.0, // D
+    -1.0, -1.0, -1.0, // E
+    -1.0,  1.0, -1.0, // F
+     1.0,  1.0, -1.0, // G
+     1.0, -1.0, -1.0, // H
+  ]
+  let elements = [
+    0,1,2, 0,2,3, // front
+    4,5,6, 4,6,7, // back
+    5,3,2, 5,2,6, // top
+    4,7,1, 4,1,0, // bottom
+    7,6,2, 7,2,1, // right
+    4,0,3, 4,3,5, // left
   ]
 
+  let colors = []
+  for (let vertex = 0; vertex < 8; vertex += 1) {
+    colors = colors.concat([r, g, b]);
+  }
+
   return {
-    positions: positions,
+    positions: vertices,
     elements: elements,
     colors: colors
   }
@@ -78,7 +33,6 @@ function createCubeData() {
 // Take the data for a cube and bind the buffers for it.
 // Return an object collection of the buffers
 function createBuffersForCube( gl, cube ) {
-
   var positions = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positions);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube.positions), gl.STATIC_DRAW);

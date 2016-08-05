@@ -1,6 +1,5 @@
 let ngl = {
-  buffers: {
-  },
+  buffers: {},
   locations: {
     position: null,
     color: null,
@@ -56,7 +55,7 @@ let gl = document.getElementById("sketch").getContext("webgl")
   ngl.locations.projection = gl.getUniformLocation(pgm, "projection")
   ngl.locations.view = gl.getUniformLocation(pgm, "view")
 
-  ngl.buffers.cube = createBuffersForCube(gl, createCubeData())
+  ngl.buffers.cube = createBuffersForCube(gl, positions_for_solid_colored_cube({ r: 1.0, g: 0.3, b: 0.3 }))
 }
 
 let state = setup()

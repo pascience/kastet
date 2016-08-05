@@ -1,6 +1,6 @@
 window.vertexShader = `
   attribute vec3 position;
-  attribute vec4 color;
+  attribute vec3 color;
 
   uniform mat4 model;
   uniform mat4 projection;
@@ -50,7 +50,7 @@ window.vertexShader = `
   }
 
   void main() {
-    vColor = color;
+    vColor = vec4(color, 1.0);
     gl_Position = projection * inverse(view) * model * vec4(position, 1.0);
   }
 `
@@ -89,7 +89,7 @@ function draw({ dt, state: { frame }, ngl, gl }) {
     
     gl.enableVertexAttribArray(ngl.locations.color)
     gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.colors)
-    gl.vertexAttribPointer(ngl.locations.color, 4, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(ngl.locations.color, 3, gl.FLOAT, false, 0, 0)
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ngl.buffers.cube.elements)
     gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0)
