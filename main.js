@@ -2,7 +2,8 @@ let ngl = {
   buffers: {},
   locations: {
     position: null,
-    color: null,
+    colorAttribute: null,
+    colorUniform: null,
     resolution: null,
     texture: null,
     model: null,
@@ -48,14 +49,13 @@ let gl = document.getElementById("sketch").getContext("webgl")
   gl.useProgram(pgm)
 
   ngl.locations.position = gl.getAttribLocation(pgm, "position")
-  ngl.locations.color = gl.getAttribLocation(pgm, "color")
+  // ngl.locations.colorAttribute = gl.getAttribLocation(pgm, "color")
+  ngl.locations.colorUniform = gl.getUniformLocation(pgm, "color")
   // ngl.locations.resolution = gl.getUniformLocation(pgm, "resolution")
   // ngl.locations.texture = gl.getUniformLocation(pgm, "texture")
   ngl.locations.model = gl.getUniformLocation(pgm, "model")
   ngl.locations.projection = gl.getUniformLocation(pgm, "projection")
-  ngl.locations.view = gl.getUniformLocation(pgm, "view")
-
-  
+  ngl.locations.view = gl.getUniformLocation(pgm, "view")  
 }
 
 draw_setup({ ngl, gl })
