@@ -70,18 +70,20 @@ function draw_setup({ ngl, gl }) {
 }
 
 let colors = {
-  red: [1.0, 0.3, 0.3],
-  green: [0.3, 1.0, 0.3],
-  blue: [0.3, 0.3, 1.0],
-  yellow: [1.0, 1.0, 0.3],
+  red: [1.0, 0.2, 0.2],
+  green: [0.2, 1.0, 0.2],
+  blue: [0.2, 0.2, 1.0],
+  yellow: [1.0, 1.0, 0.2],
 }
 
-function draw_frame({ dt, state: { frame }, ngl, gl }) {
+let lighten = (rgb, amount) => rgb.map(x => Math.min(1.0, x*(1.0+amount)))
+
+function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
   { // setup the camera & perspective
-    let projection = perspectiveMatrix(70*Math.PI/180, ngl.width/ngl.height, 1, 10)
+    let projection = perspectiveMatrix(70*Math.PI/180, ngl.width/ngl.height, 1, 50)
     let view = multiplyArrayOfMatrices([
-      translateMatrix(0, 1.5, 3),
-      rotateXMatrix(0.5),
+      translateMatrix(camera.position[0], camera.position[1], camera.position[2]),
+      rotateXMatrix(Math.PI/2),
       // scaleMatrix(1, 1, 0.5),
       // scaleMatrix(1, 1, 1), // last arg = zoom, if the looked-at point is the origin
     ])
@@ -94,7 +96,6 @@ function draw_frame({ dt, state: { frame }, ngl, gl }) {
     gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.positions)
     gl.vertexAttribPointer(ngl.locations.position, 3, gl.FLOAT, false, 0, 0)
 
-    
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ngl.buffers.cube.elements)
   }
   let drawCubeElements = () => { gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0) }
@@ -102,20 +103,35 @@ function draw_frame({ dt, state: { frame }, ngl, gl }) {
     gl.uniform3fv(ngl.locations.colorUniform, rgb)
   }
 
-  let drawCube = ({ x, y }) => {
+  let drawCube = ({ x, y, z }) => {
     gl.uniformMatrix4fv(ngl.locations.model, false, new Float32Array(multiplyArrayOfMatrices([
-      translateMatrix(x, y, 0),
+      translateMatrix(x, y, z),
       scaleMatrix(0.5, 0.5, 0.5)
     ])))
     drawCubeElements()
   }
 
-  useColor(colors.red)
-  drawCube({ x: -1.5, y: 0 })
-  useColor(colors.green)
-  drawCube({ x: -0.5, y: 0 })
-  useColor(colors.blue)
-  drawCube({ x: 0.5, y: 0 })
-  useColor(colors.yellow)
-  drawCube({ x: 1.5, y: 0 })
+  ["red" , "green", "blue", "yellow"].forEach((color, color_number) => {
+    pieces_for_color[color].forEach((piece_id, piece_number_for_this_color) => {
+      let piece_model = puzzle_models[piece_id]
+      
+      for(let cell = 0; cell < piece_model.length; cell += 1) {
+        let height = piece_model[cell]
+        if(height < 1) {
+          continue
+        }
+
+        let cur_height = 0
+        while(cur_height < height) {
+          useColor(lighten(colors[color], cur_height == 1 ? 0.5 : 0))
+          drawCube({
+            x: piece_number_for_this_color*3 + cell % 2,
+            z: color_number*10 + Math.floor(cell / 2),
+            y: cur_height
+          })
+          cur_height += 1
+        }
+      }
+    })
+  })
 }

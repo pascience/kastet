@@ -58,10 +58,21 @@ let gl = document.getElementById("sketch").getContext("webgl")
   ngl.locations.view = gl.getUniformLocation(pgm, "view")  
 }
 
+
+let pressed_keys = {}
+window.addEventListener("keydown", function(event) {
+  if(! event.repeat) {
+    pressed_keys[event.key] = true
+  }
+}, true)
+window.addEventListener("keyup", function(event) {
+  delete pressed_keys[event.key]
+}, true)
+
 draw_setup({ ngl, gl })
 let state = world_setup()
 let each_frame = (dt) => {
-  state = world_step({ dt, state })
+  state = world_step({ dt, state, keys: pressed_keys })
   draw_frame({ dt, state, ngl, gl })
   requestAnimationFrame(each_frame)
 }
