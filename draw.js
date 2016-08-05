@@ -116,17 +116,13 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
       if(height < 1) {
         continue
       }
-
-      let cur_height = 0
-      while(cur_height < height) {
+      for(let cur_height = 0; cur_height < height; cur_height += 1) {
         useColor(lighten(rgb, cur_height == 1 ? 0.5 : 0))
-        
         drawCube({
           x: offset[0] + cell % 2,
           z: offset[1] + Math.floor(cell / 2),
           y: offset[2] + cur_height
         })
-        cur_height += 1
       }
     }
   }
