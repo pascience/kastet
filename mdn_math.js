@@ -18,15 +18,9 @@ function positions_for_solid_colored_cube({ r, g, b }) {
     4,0,3, 4,3,5, // left
   ]
 
-  let colors = []
-  for (let vertex = 0; vertex < 8; vertex += 1) {
-    colors = colors.concat([r, g, b]);
-  }
-
   return {
     positions: vertices,
     elements: elements,
-    colors: colors
   }
 }
 
@@ -37,17 +31,12 @@ function createBuffersForCube( gl, cube ) {
   gl.bindBuffer(gl.ARRAY_BUFFER, positions);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube.positions), gl.STATIC_DRAW);
 
-  var colors = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, colors);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cube.colors), gl.STATIC_DRAW);
-
   var elements = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elements);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cube.elements), gl.STATIC_DRAW);
 
   return {
     positions: positions,
-    colors: colors,
     elements: elements
   }
 }
