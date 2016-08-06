@@ -1,30 +1,12 @@
-let canvas = document.getElementById("sketch")
+let renderer = new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth, window.innerHeight)
+document.querySelector("#rendererContainer").appendChild(renderer.domElement)
+
 
 let ngl = {
-  buffers: {},
-  locations: {
-    aVertexPosition: null,
-    aVertexNormal: null,
-    uVertexColor: null,
-    uModelMatrix: null,
-    uProjectionMatrix: null,
-    uViewMatrix: null,
-  },
-  width: document.body.offsetWidth,
-  height: document.body.offsetHeight,
   pressed_keys: {},
   mouseWheelDeltaY: 0,
 }
-
-canvas.width = document.body.offsetWidth
-canvas.height = document.body.offsetHeight
-window.addEventListener("resize", () => {
-  ngl.width = document.body.offsetWidth
-  ngl.height = document.body.offsetHeight
-  canvas.width = document.body.offsetWidth
-  canvas.height = document.body.offsetHeight
-})
-
 window.addEventListener("keydown", function(event) {
   if(! event.repeat) {
     ngl.pressed_keys[event.key] = true
@@ -37,71 +19,105 @@ window.addEventListener("mousewheel", function(event) {
   ngl.mouseWheelDeltaY = event.deltaY > 0 ? 1 : (event.deltaY < 0 ? -1 : 0)
 }, true)
 
-let gl = canvas.getContext("webgl")
-{ // setup WebGL
-  gl.clearColor(0.4, 0.4, 0.5, 1.0)
-  gl.clearDepth(1.0)
-  gl.enable(gl.DEPTH_TEST)
-  gl.depthFunc(gl.LEQUAL)
 
-  let pgm = gl.createProgram()
-  { // compile and link shaders into the program
-    function createShader(source, type) {
-      let shader = gl.createShader(type)
-      gl.shaderSource(shader, source)
-      gl.compileShader(shader)
-      if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        let info = gl.getShaderInfoLog(shader)
-        throw `Could not compile WebGL program.\n\n${info}`
-      }
-      return shader
+let textbox = (() => {
+  let element = document.querySelector("#textbox")
+  let text = ""
+  function draw() {
+    element.innerHTML = text
+  }
+  function clear() {
+    text = ""
+  }
+  function println(txt) {
+    text += txt + "<br>"
+  }
+  return { clear, println, draw }
+})()
+
+
+let scene = new THREE.Scene()
+let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 50)
+{ // setup the scene
+  if(false) { // gizmo
+    let addCube = (x, y, z, color) => {
+      let geometry = new THREE.BoxGeometry(1, 1, 1)
+      let material = new THREE.MeshBasicMaterial({ color })
+      let mesh = new THREE.Mesh(geometry, material)
+      mesh.position.x = x
+      mesh.position.y = y
+      mesh.position.z = z
+      scene.add(mesh)
     }
-    let vertexShader = createShader(window.vertexSource, gl.VERTEX_SHADER)
-    let fragmentShader = createShader(window.fragmentSource, gl.FRAGMENT_SHADER)
-    gl.attachShader(pgm, vertexShader)
-    gl.attachShader(pgm, fragmentShader)
-    gl.linkProgram(pgm)
-    if(!gl.getProgramParameter(pgm, gl.LINK_STATUS)) {
-      let info = gl.getProgramInfoLog(pgm)
-      throw `Could not link WebGL program.\n\n${info}`
-    }
+    addCube(0, 0, 0, 0xffff00)
+    addCube(1, 0, 0, 0xff0000)
+    addCube(0, 1, 0, 0x00ff00)
+    addCube(0, 0, 1, 0x0000ff)
   }
 
-  gl.useProgram(pgm)
-  { // retrieve GLSL attribute/uniform locations
-    ngl.locations.aVertexPosition = gl.getAttribLocation(pgm, "aVertexPosition")
-    gl.enableVertexAttribArray(ngl.locations.aVertexPosition)
-    ngl.locations.aVertexNormal = gl.getAttribLocation(pgm, "aVertexNormal")
-    gl.enableVertexAttribArray(ngl.locations.aVertexNormal)
+  let rgb_for_color = {
+    red: 0xff0000,
+    green: 0x00ff00,
+    blue: 0x0000ff,
+    yellow: 0xffff00,
+  }
+  let piece_dimension = [0.4, 0.8, 0.1]
 
-    ngl.locations.uVertexColor = gl.getUniformLocation(pgm, "uVertexColor")
-    ngl.locations.uModelMatrix = gl.getUniformLocation(pgm, "uModelMatrix")
-    ngl.locations.uProjectionMatrix = gl.getUniformLocation(pgm, "uProjectionMatrix")
-    ngl.locations.uViewMatrix = gl.getUniformLocation(pgm, "uViewMatrix")
+  { // render all existing pieces
+    let cumulative_color_offset = 0
+    let piece_element_geometry = new THREE.BoxGeometry(...piece_dimension);
+    ["red" , "green", "blue", "yellow"].forEach((color_name, color_number) => {
+      let material_for_this_color = new THREE.MeshBasicMaterial({ color: rgb_for_color[color_name] })
 
-    ngl.locations.uAmbientLightColor = gl.getUniformLocation(pgm, "uAmbientLightColor")
-    ngl.locations.uDirLight1Color = gl.getUniformLocation(pgm, "uDirLight1Color")
-    ngl.locations.uDirLight1Vector = gl.getUniformLocation(pgm, "uDirLight1Vector")
-    ngl.locations.uDirLight2Color = gl.getUniformLocation(pgm, "uDirLight2Color")
-    ngl.locations.uDirLight2Vector = gl.getUniformLocation(pgm, "uDirLight2Vector")
+      pieces_for_color[color_name].forEach((piece_id, piece_number_for_this_color) => {
+        let colored_piece_node = new THREE.Object3D()
+        colored_piece_node.position.x = (cumulative_color_offset+piece_number_for_this_color)*piece_dimension[0]*2.5
+        colored_piece_node.position.y = 0
+        colored_piece_node.position.z = 0
+        scene.add(colored_piece_node)
+
+        let piece_model = puzzle_models[piece_id]
+        for(let cell = 0; cell < piece_model.length; cell += 1) {
+          let height = piece_model[cell]
+          if(height < 1) {
+            continue
+          }
+          for(let cur_height = 0; cur_height < height; cur_height += 1) {
+            let element = new THREE.Mesh(piece_element_geometry, material_for_this_color)
+            element.position.x = piece_dimension[0]*(cell % 2)
+            element.position.y = piece_dimension[1]*Math.floor(cell / 2)
+            element.position.z = piece_dimension[2]*cur_height
+            colored_piece_node.add(element)
+          }
+        }
+      })
+      cumulative_color_offset += number_of_pieces_for_color(color_name) + 0.5
+    })
+  }
+}
+
+function draw_frame({ dt, state }) {
+  {
+    textbox.clear()
+    let pos = state.camera.position.map(x => Math.floor(x*100)/100)
+    textbox.println(`[${pos[0]},${pos[1]},${pos[2]}]`)
+    textbox.println("move : directional keys")
+    textbox.println("zoom : Z/S or mouse wheel")
+    textbox.draw()
   }
 
-  ngl.buffers.cube = createBuffersForCube(gl, buffer_data_for_cube())
+  camera.position.x = state.camera.position[0]
+  camera.position.y = state.camera.position[1]
+  camera.position.z = state.camera.position[2]
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.positions)
-  gl.vertexAttribPointer(ngl.locations.aVertexPosition, 3, gl.FLOAT, false, 0, 0)
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, ngl.buffers.cube.normals)
-  gl.vertexAttribPointer(ngl.locations.aVertexNormal, 3, gl.FLOAT, false, 0, 0)
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ngl.buffers.cube.elements)
+  renderer.render(scene, camera)
 }
 
 let state = world_setup()
 let each_frame = (dt) => {
   state = world_step({ dt, state, keys: ngl.pressed_keys, zoomDelta: ngl.mouseWheelDeltaY })
   ngl.mouseWheelDeltaY = 0
-  draw_frame({ dt, state, ngl, gl })
+  draw_frame({ dt, state })
   requestAnimationFrame(each_frame)
 }
 requestAnimationFrame(each_frame)

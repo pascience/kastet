@@ -71,7 +71,7 @@ function world_setup() {
     t: 0,
     frame: 0,
     camera: {
-    	position: [18.48,3.58,16.78]
+    	position: [15.18,4.1,15.18]
     }
   }
 }
