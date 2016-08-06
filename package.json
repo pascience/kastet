@@ -1,0 +1,27 @@
+{
+  "name": "kastet",
+  "version": "1.0.0",
+  "private": "true",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "js-csp": "^0.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pascience/kastet.git"
+  },
+  "keywords": [
+    "webgl"
+  ],
+  "author": "Naji Mammeri <naji@pascience.net>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/pascience/kastet/issues"
+  },
+  "homepage": "https://pascience.github.io/kastet"
+}
