@@ -1,3 +1,18 @@
+let textbox = (() => {
+  let element = document.querySelector("#textbox")
+  let text = ""
+  function draw() {
+    element.innerHTML = text
+  }
+  function clear() {
+    text = ""
+  }
+  function println(txt) {
+    text += txt + "\n"
+  }
+  return { clear, println, draw }
+})()
+
 let rgb_for_color = {
   red: [1.0, 0.2, 0.2],
   green: [0.2, 1.0, 0.2],
@@ -39,6 +54,7 @@ let drawPiece = ({ piece_id, offset }) => {
 }
 
 function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
+  textbox.clear()
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
   { // setup the camera & perspective
@@ -61,4 +77,8 @@ function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
       })
     })
   })
+
+  let pos = camera.position.map(x => Math.floor(x*100)/100)
+  textbox.println(`[${pos[0]},${pos[1]},${pos[2]}]`)
+  textbox.draw()
 }
