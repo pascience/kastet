@@ -20,22 +20,6 @@ window.addEventListener("mousewheel", function(event) {
 }, true)
 
 
-let textbox = (() => {
-  let element = document.querySelector("#textbox")
-  let text = ""
-  function draw() {
-    element.innerHTML = text
-  }
-  function clear() {
-    text = ""
-  }
-  function println(txt) {
-    text += txt + "<br>"
-  }
-  return { clear, println, draw }
-})()
-
-
 let scene = new THREE.Scene()
 let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 50)
 { // setup the scene
