@@ -16,6 +16,9 @@ function three_setup(parentElementSelector) {
 
   let pieces = {}
   {
+    let parent_of_pieces = new THREE.Object3D()
+    scene.add(parent_of_pieces)
+
     let cumulative_color_offset = 0
     let piece_element_geometry = new THREE.BoxGeometry(...piece_dimension);
     ["red" , "green", "blue", "yellow"].forEach((color_name, color_number) => {
@@ -26,9 +29,10 @@ function three_setup(parentElementSelector) {
         colored_piece_node.position.x = (cumulative_color_offset+piece_number_for_this_color)*piece_dimension[0]*2.5
         colored_piece_node.position.y = 0
         colored_piece_node.position.z = 0
-        scene.add(colored_piece_node)
+        parent_of_pieces.add(colored_piece_node)
 
         let piece_model = puzzle_models[piece_id]
+        let center = center_of_piece(piece_id)
 
         for(let cell = 0; cell < piece_model.length; cell += 1) {
           let height = piece_model[cell]
@@ -37,8 +41,8 @@ function three_setup(parentElementSelector) {
           }
           for(let cur_height = 0; cur_height < height; cur_height += 1) {
             let element = new THREE.Mesh(piece_element_geometry, material_for_this_color)
-            element.position.x = piece_dimension[0]*(cell % 2)
-            element.position.y = piece_dimension[1]*Math.floor(cell / 2)
+            element.position.x = piece_dimension[0]*((cell % 2)-center[0])
+            element.position.y = piece_dimension[1]*(Math.floor(cell / 2)-center[1])
             element.position.z = piece_dimension[2]*cur_height
             colored_piece_node.add(element)
             pieces[color_name+piece_number_for_this_color] = colored_piece_node
@@ -47,6 +51,7 @@ function three_setup(parentElementSelector) {
       })
       cumulative_color_offset += number_of_pieces_for_color(color_name) + 0.5
     })
+    parent_of_pieces.position.x -= cumulative_color_offset/2
   }
 
   return {

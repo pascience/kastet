@@ -64,3 +64,9 @@ let pieces_for_color = (() => {
 function number_of_pieces_for_color(color_name) {
   return pieces_for_color[color_name].length
 }
+
+function center_of_piece(piece_id) {
+	let piece = puzzle_models[piece_id]
+	let height = piece.length/2
+	return [1,1+Math.floor(height/2)]
+}
