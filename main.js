@@ -12,7 +12,8 @@ let ngl = {
   },
   width: document.body.offsetWidth,
   height: document.body.offsetHeight,
-  pressed_keys: {}
+  pressed_keys: {},
+  mouseWheelDeltaY: 0,
 }
 
 canvas.width = document.body.offsetWidth
@@ -31,6 +32,9 @@ window.addEventListener("keydown", function(event) {
 }, true)
 window.addEventListener("keyup", function(event) {
   delete ngl.pressed_keys[event.key]
+}, true)
+window.addEventListener("mousewheel", function(event) {
+  ngl.mouseWheelDeltaY = event.deltaY > 0 ? 1 : (event.deltaY < 0 ? -1 : 0)
 }, true)
 
 let gl = canvas.getContext("webgl")
@@ -86,7 +90,8 @@ let gl = canvas.getContext("webgl")
 
 let state = world_setup()
 let each_frame = (dt) => {
-  state = world_step({ dt, state, keys: ngl.pressed_keys })
+  state = world_step({ dt, state, keys: ngl.pressed_keys, zoomDelta: ngl.mouseWheelDeltaY })
+  ngl.mouseWheelDeltaY = 0
   draw_frame({ dt, state, ngl, gl })
   requestAnimationFrame(each_frame)
 }

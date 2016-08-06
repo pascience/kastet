@@ -72,7 +72,7 @@ function world_setup() {
   }
 }
 
-function world_step({ dt, state: { t, frame, camera }, keys }) {
+function world_step({ dt, state: { t, frame, camera }, keys, zoomDelta }) {
 	let camera_position = camera.position
 	if(keys["ArrowRight"]) {
 		camera_position[0] += 0.1
@@ -91,6 +91,12 @@ function world_step({ dt, state: { t, frame, camera }, keys }) {
 	}
 	if(keys["s"] || keys["S"]) {
 		camera_position[1] += 0.1
+	}
+	if(zoomDelta == 1) {
+		camera_position[1] += 0.8
+	}
+	if(zoomDelta == -1) {
+		camera_position[1] -= 0.8	
 	}
   return {
     t: t+dt,
