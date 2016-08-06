@@ -62,14 +62,16 @@ void main() {
   gl_Position = uProjectionMatrix * mvMatrix * vec4(aVertexPosition, 1.0);
 
   mat4 normalMatrix = transpose(inverse(mvMatrix));
-  
-  highp vec3 ambientLight = vec3(0.6, 0.6, 0.6);
-  highp vec3 directionalLightColor = vec3(0.5, 0.5, 0.75);
-  highp vec3 directionalVector = vec3(0.85, 0.8, 0.75);
-  
   highp vec4 transformedNormal = normalMatrix * vec4(aVertexNormal, 1.0);
   
-  highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
-  vLighting = uVertexColor * (ambientLight + (directionalLightColor * directional));
+  highp vec3 ambientLight = vec3(0.4);
+  highp vec3 dLight1Color = vec3(0.5, 0.5, 0.75);
+  highp vec3 dLight1Vector = vec3(0.3, 1, 0);
+  highp vec3 dLight2Color = vec3(0.5, 0.5, 0.2);
+  highp vec3 dLight2Vector = vec3(0, 0, 1);
+  
+  highp float directional1 = max(dot(transformedNormal.xyz, dLight1Vector), 0.0);
+  highp float directional2 = max(dot(transformedNormal.xyz, dLight2Vector), 0.0);
+  vLighting = uVertexColor * (ambientLight + ((dLight1Color * directional1) + (dLight2Color * directional2))*0.5);
 }
 `

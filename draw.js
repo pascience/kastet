@@ -8,6 +8,8 @@ let rgb_for_color = {
 let lighten = (rgb, amount) => rgb.map(x => Math.min(1.0, x*(1.0+amount)))
 
 function draw_frame({ dt, state: { frame, camera }, ngl, gl }) {
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
   { // setup the camera & perspective
     let projection = perspectiveMatrix(70*Math.PI/180, ngl.width/ngl.height, 1, 50)
     let view = multiplyArrayOfMatrices([

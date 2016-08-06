@@ -39,7 +39,10 @@ window.addEventListener("mousewheel", function(event) {
 
 let gl = canvas.getContext("webgl")
 { // setup WebGL
+  gl.clearColor(0.4, 0.4, 0.5, 1.0)
+  gl.clearDepth(1.0)
   gl.enable(gl.DEPTH_TEST)
+  gl.depthFunc(gl.LEQUAL)
 
   let pgm = gl.createProgram()
   { // compile and link shaders into the program
