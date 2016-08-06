@@ -2,51 +2,17 @@ let renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.querySelector("#rendererContainer").appendChild(renderer.domElement)
 
-
-let ngl = {
-  pressed_keys: {},
-  mouseWheelDeltaY: 0,
+let rgb_for_color = {
+  red: 0xff0000,
+  green: 0x00ff00,
+  blue: 0x0000ff,
+  yellow: 0xffff00,
 }
-window.addEventListener("keydown", function(event) {
-  if(! event.repeat) {
-    ngl.pressed_keys[event.key] = true
-  }
-}, true)
-window.addEventListener("keyup", function(event) {
-  delete ngl.pressed_keys[event.key]
-}, true)
-window.addEventListener("mousewheel", function(event) {
-  ngl.mouseWheelDeltaY = event.deltaY > 0 ? 1 : (event.deltaY < 0 ? -1 : 0)
-}, true)
-
+let piece_dimension = [0.4, 0.8, 0.1]
 
 let scene = new THREE.Scene()
 let camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 50)
 { // setup the scene
-  if(false) { // gizmo
-    let addCube = (x, y, z, color) => {
-      let geometry = new THREE.BoxGeometry(1, 1, 1)
-      let material = new THREE.MeshBasicMaterial({ color })
-      let mesh = new THREE.Mesh(geometry, material)
-      mesh.position.x = x
-      mesh.position.y = y
-      mesh.position.z = z
-      scene.add(mesh)
-    }
-    addCube(0, 0, 0, 0xffff00)
-    addCube(1, 0, 0, 0xff0000)
-    addCube(0, 1, 0, 0x00ff00)
-    addCube(0, 0, 1, 0x0000ff)
-  }
-
-  let rgb_for_color = {
-    red: 0xff0000,
-    green: 0x00ff00,
-    blue: 0x0000ff,
-    yellow: 0xffff00,
-  }
-  let piece_dimension = [0.4, 0.8, 0.1]
-
   { // render all existing pieces
     let cumulative_color_offset = 0
     let piece_element_geometry = new THREE.BoxGeometry(...piece_dimension);
