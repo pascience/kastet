@@ -67,7 +67,7 @@ function world_setup() {
     t: 0,
     frame: 0,
     camera: {
-    	position: [20, 35, 20]
+    	position: [-2.31,0.39,6.49]
     }
   }
 }
@@ -81,22 +81,22 @@ function world_step({ dt, state: { t, frame, camera }, keys, zoomDelta }) {
 		camera_position[0] -= 0.1
 	}
 	if(keys["ArrowDown"]) {
-		camera_position[2] += 0.1
-	}
-	if(keys["ArrowUp"]) {
-		camera_position[2] -= 0.1
-	}
-	if(keys["z"] || keys["Z"]) {
 		camera_position[1] -= 0.1
 	}
-	if(keys["s"] || keys["S"]) {
+	if(keys["ArrowUp"]) {
 		camera_position[1] += 0.1
 	}
+	if(keys["z"] || keys["Z"]) {
+		camera_position[2] -= 0.1
+	}
+	if(keys["s"] || keys["S"]) {
+		camera_position[2] += 0.1
+	}
 	if(zoomDelta == 1) {
-		camera_position[1] += 0.8
+		camera_position[2] += 0.8
 	}
 	if(zoomDelta == -1) {
-		camera_position[1] -= 0.8	
+		camera_position[2] -= 0.8	
 	}
   return {
     t: t+dt,
