@@ -61,13 +61,17 @@ let pieces_for_color = (() => {
 	}
 })()
 
+function number_of_pieces_for_color(color_name) {
+  return pieces_for_color[color_name].length
+}
+
 
 function world_setup() {
   return {
     t: 0,
     frame: 0,
     camera: {
-    	position: [-2.31,0.39,6.49]
+    	position: [18.48,3.58,16.78]
     }
   }
 }

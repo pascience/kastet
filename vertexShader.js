@@ -7,6 +7,12 @@ uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 
+uniform vec3 uAmbientLightColor;
+uniform vec3 uDirLight1Color;
+uniform vec3 uDirLight1Vector;
+uniform vec3 uDirLight2Color;
+uniform vec3 uDirLight2Vector;
+
 varying vec3 vLighting;
 
 mat4 inverse(mat4 m) {
@@ -64,14 +70,8 @@ void main() {
   mat4 normalMatrix = transpose(inverse(mvMatrix));
   highp vec4 transformedNormal = normalMatrix * vec4(aVertexNormal, 1.0);
   
-  highp vec3 ambientLight = vec3(0.4);
-  highp vec3 dLight1Color = vec3(0.5, 0.5, 0.75);
-  highp vec3 dLight1Vector = vec3(0.3, 1, 0);
-  highp vec3 dLight2Color = vec3(0.5, 0.5, 0.2);
-  highp vec3 dLight2Vector = vec3(0, 0, 1);
-  
-  highp float directional1 = max(dot(transformedNormal.xyz, dLight1Vector), 0.0);
-  highp float directional2 = max(dot(transformedNormal.xyz, dLight2Vector), 0.0);
-  vLighting = uVertexColor * (ambientLight + ((dLight1Color * directional1) + (dLight2Color * directional2))*0.5);
+  highp float directional1 = max(dot(transformedNormal.xyz, uDirLight1Vector), 0.0);
+  highp float directional2 = max(dot(transformedNormal.xyz, uDirLight2Vector), 0.0);
+  vLighting = uVertexColor * (uAmbientLightColor + ((uDirLight2Color * directional1) + 0.2*(uDirLight2Color * directional2))*0.5);
 }
 `

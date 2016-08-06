@@ -21,11 +21,39 @@ canvas {
   color: white;
   text-shadow: 1px 1px black;
 }
+#controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5em;
+  font-family: monospace;
+  font-size: 11px;
+  color: white;
+  text-shadow: 1px 1px black;
+  background: rgba(255,255,255,0.3);
+  text-align: center;
+  display: flex;
+  flex-flow: row nowrap;
+}
+#controls .control {
+  width: 200px;
+  padding: 0.5em;
+}
+#controls .control input {
+  width: 100%;
+}
+#controls .control .control__name {
+  font-weight: bold;
+}
+#controls .control .component {
+  display: block;
+}
 </style>
 </head>
 <body>
   <canvas id="sketch"></canvas>
   <div id="textbox"></div>
+  <div id="controls"></div>
   <script src="thirdparty_bundle.js"></script>
   <script src="vertexShader.js"></script>
   <script src="fragmentShader.js"></script>

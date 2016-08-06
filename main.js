@@ -78,6 +78,12 @@ let gl = canvas.getContext("webgl")
     ngl.locations.uModelMatrix = gl.getUniformLocation(pgm, "uModelMatrix")
     ngl.locations.uProjectionMatrix = gl.getUniformLocation(pgm, "uProjectionMatrix")
     ngl.locations.uViewMatrix = gl.getUniformLocation(pgm, "uViewMatrix")
+
+    ngl.locations.uAmbientLightColor = gl.getUniformLocation(pgm, "uAmbientLightColor")
+    ngl.locations.uDirLight1Color = gl.getUniformLocation(pgm, "uDirLight1Color")
+    ngl.locations.uDirLight1Vector = gl.getUniformLocation(pgm, "uDirLight1Vector")
+    ngl.locations.uDirLight2Color = gl.getUniformLocation(pgm, "uDirLight2Color")
+    ngl.locations.uDirLight2Vector = gl.getUniformLocation(pgm, "uDirLight2Vector")
   }
 
   ngl.buffers.cube = createBuffersForCube(gl, buffer_data_for_cube())
